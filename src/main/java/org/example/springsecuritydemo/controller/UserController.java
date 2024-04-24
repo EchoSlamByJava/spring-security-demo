@@ -2,6 +2,8 @@ package org.example.springsecuritydemo.controller;
 
 import lombok.AllArgsConstructor;
 import org.example.springsecuritydemo.domain.User;
+import org.example.springsecuritydemo.exception.EmailAlreadyExistsException;
+import org.example.springsecuritydemo.exception.UserNotFoundException;
 import org.example.springsecuritydemo.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +24,13 @@ public class UserController {
 
     @GetMapping("/get/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public User getUserByEmail(@PathVariable String email) {
-        return userService.findByEmail(email);
+    public User getUserByEmail(@PathVariable String email) throws UserNotFoundException {
+        return userService.getByEmail(email);
     }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody User user) {
+    public User createUser(@RequestBody User user) throws EmailAlreadyExistsException {
         return userService.create(user);
     }
 
