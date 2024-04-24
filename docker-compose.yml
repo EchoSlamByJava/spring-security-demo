@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    container_name: sec-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+      MONGO_INITDB_DATABASE: spring-security
+      #MONGODB_AUTH_DATABASE: admin
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.stats().ok' | mongosh localhost:27017/graph --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mongo-express:
+    image: mongo-express
+    container_name: sec-mongo-express
+    restart: unless-stopped
+    ports:
+      - "28081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: changeme
+      #ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoadmin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongoadmin
+      ME_CONFIG_MONGODB_URL: mongo://mongoadmin:mongoadmin@mongo:27017/
+    depends_on:
+      mongo:
+        condition: service_healthy
