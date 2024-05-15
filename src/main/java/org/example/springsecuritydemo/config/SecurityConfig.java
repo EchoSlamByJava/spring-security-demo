@@ -2,7 +2,7 @@ package org.example.springsecuritydemo.config;
 
 import lombok.AllArgsConstructor;
 import org.example.springsecuritydemo.security.JwtAuthenticationFilter;
-import org.example.springsecuritydemo.service.UserService;
+import org.example.springsecuritydemo.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-    private UserService userService;
+    private CustomUserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -63,7 +63,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         var authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService.userDetailsService());
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

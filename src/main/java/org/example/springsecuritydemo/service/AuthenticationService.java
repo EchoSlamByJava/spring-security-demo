@@ -3,7 +3,10 @@ package org.example.springsecuritydemo.service;
 import lombok.AllArgsConstructor;
 import org.example.springsecuritydemo.domain.User;
 import org.example.springsecuritydemo.exception.EmailAlreadyExistsException;
-import org.example.springsecuritydemo.security.*;
+import org.example.springsecuritydemo.security.JwtAuthenticationResponse;
+import org.example.springsecuritydemo.security.Role;
+import org.example.springsecuritydemo.security.SignInRequest;
+import org.example.springsecuritydemo.security.SignUpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class AuthenticationService {
-    private UserService userService;
-    private JwtService jwtService;
-    private PasswordEncoder passwordEncoder;
-    private AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService userDetailsService;
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     /**
      * Регистрация пользователя
@@ -45,7 +49,7 @@ public class AuthenticationService {
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        var user = userService.userDetailsService()
+        var user = userDetailsService
                 .loadUserByUsername(request.getEmail());
 
         var jwt = jwtService.generateToken(user);

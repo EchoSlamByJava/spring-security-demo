@@ -5,9 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.springsecuritydemo.service.CustomUserDetailsService;
 import org.example.springsecuritydemo.service.JwtService;
 import org.example.springsecuritydemo.service.UserService;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,12 +20,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+@Slf4j
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer";
     public static final String HEADER_NAME = "Authorization";
     public final JwtService jwtService;
     public final UserService userService;
+    public final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -43,12 +46,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var email = jwtService.extractEmail(jwt);
 
         if (!StringUtils.hasText(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var userDetails = userService
-                    .userDetailsService()
+            var userDetails = userDetailsService
                     .loadUserByUsername(email);
 
             // Есои токен валиден, то аутентифицируем пользователя
             if (jwtService.isTokenValid(jwt, userDetails)) {
+                log.error("Token={} is valid", jwt);
                 var context = SecurityContextHolder.createEmptyContext();
 
                 var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
