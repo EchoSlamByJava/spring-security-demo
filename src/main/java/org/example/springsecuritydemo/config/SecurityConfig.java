@@ -3,7 +3,7 @@ package org.example.springsecuritydemo.config;
 import lombok.AllArgsConstructor;
 import org.example.springsecuritydemo.security.JwtAuthenticationFilter;
 import org.example.springsecuritydemo.security.SecurityExceptionHandler;
-import org.example.springsecuritydemo.service.CustomUserDetailsService;
+import org.example.springsecuritydemo.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,4 +1,4 @@
-package org.example.springsecuritydemo.service;
+package org.example.springsecuritydemo.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

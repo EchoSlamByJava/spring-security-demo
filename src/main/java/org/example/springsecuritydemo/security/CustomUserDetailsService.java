@@ -1,4 +1,4 @@
-package org.example.springsecuritydemo.service;
+package org.example.springsecuritydemo.security;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springsecuritydemo.domain.User;
