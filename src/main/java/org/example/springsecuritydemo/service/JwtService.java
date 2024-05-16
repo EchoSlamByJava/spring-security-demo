@@ -10,13 +10,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class JwtService implements Serializable {
     @Value("${token.signing.key}")
     private String jwtSigningKey;
 
@@ -41,7 +42,6 @@ public class JwtService {
         if (userDetails instanceof User customUserDetails) {
             claims.put("uid", customUserDetails.getUid());
             claims.put("email", customUserDetails.getEmail());
-            claims.put("role", customUserDetails.getRole());
         }
         return generateToken(claims, userDetails);
     }
@@ -72,6 +72,17 @@ public class JwtService {
     }
 
     /**
+     * Извлечение всех данных из токена
+     *
+     * @param token токен
+     * @return данные
+     */
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token)
+                .getPayload();
+    }
+
+    /**
      * Генерация токена
      *
      * @param extraClaims дополнительные данные
@@ -79,10 +90,6 @@ public class JwtService {
      * @return токен
      */
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-/*        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();*/
         return Jwts.builder().claims(extraClaims).subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
@@ -107,19 +114,6 @@ public class JwtService {
      */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
-    }
-
-    /**
-     * Извлечение всех данных из токена
-     *
-     * @param token токен
-     * @return данные
-     */
-    private Claims extractAllClaims(String token) {
-/*        return Jwts.parser().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
-                .getBody();*/
-        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token)
-                .getPayload();
     }
 
     /**

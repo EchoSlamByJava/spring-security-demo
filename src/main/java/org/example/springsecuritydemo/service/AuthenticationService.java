@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.example.springsecuritydemo.domain.User;
 import org.example.springsecuritydemo.exception.EmailAlreadyExistsException;
 import org.example.springsecuritydemo.security.JwtAuthenticationResponse;
-import org.example.springsecuritydemo.security.Role;
 import org.example.springsecuritydemo.security.SignInRequest;
 import org.example.springsecuritydemo.security.SignUpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +30,6 @@ public class AuthenticationService {
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ROLE_USER)
                 .build();
 
         userService.create(user);
