@@ -3,9 +3,8 @@ package org.example.springsecuritydemo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.example.springsecuritydemo.exception.UserNotFoundException;
-import org.example.springsecuritydemo.service.UserService;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,24 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/example")
 @Tag(name = "Пример контроллера для разных ролей")
 public class ExampleController {
-    private UserService service;
 
     @GetMapping
     @Operation(summary = "Доступен только авторизованным пользователям")
-    public String example() {
-        return "Hello, world!";
-    }
-
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Доступен только авторизованным пользователям с ролью ADMIN")
-    public String exampleAdmin() {
-        return "Hello, admin!";
-    }
-
-    @GetMapping("/get-admin")
-    @Operation(summary = "Получить роль ADMIN (для демонстрации)")
-    public void getAdmin() throws UserNotFoundException {
-        service.getAdmin();
+    public String example(Authentication authentication) {
+        var userDetails =  (UserDetails) authentication.getPrincipal();
+        return "Hello, world! by " + userDetails.getUsername();
     }
 }
