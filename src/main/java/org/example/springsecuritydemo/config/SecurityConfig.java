@@ -2,6 +2,7 @@ package org.example.springsecuritydemo.config;
 
 import lombok.AllArgsConstructor;
 import org.example.springsecuritydemo.security.JwtAuthenticationFilter;
+import org.example.springsecuritydemo.security.SecurityExceptionHandler;
 import org.example.springsecuritydemo.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ import java.util.List;
 public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     private CustomUserDetailsService userDetailsService;
+    private SecurityExceptionHandler exceptionHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,6 +44,9 @@ public class SecurityConfig {
                     corsConfig.setAllowCredentials(true);
                     return corsConfig;
                 }))
+                .exceptionHandling(handling -> {
+                    handling.authenticationEntryPoint(exceptionHandler);
+                })
                 //Настройка доступа к конечным точкам
                 .authorizeHttpRequests(registry -> registry
                         // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
